@@ -1,19 +1,18 @@
 from IPython.display import display,Javascript
 import numpy as np
 
-def control(app,stores=None,viewClass=None):
+def control(app,stores=None,viewClass=None, controllers=None, config=None):
   if viewClass is None:
     capitalizedApp = app.capitalize()
     viewClass = '{}.view.{}Panel'.format(app,capitalizedApp)
-    # controllers = "controllers: '{}PanelController',".format(capitalizedApp)
-    controllers = ''
-  else:
-    controllers = ''
+    controllers = "controllers: '{}PanelController',".format(capitalizedApp)
+
   code = '''var out = Jupyter.notebook.get_selected_cell().output_area.element[0];
     Ext.application({{
       name: '{}',
       paths: {{
         'jupyter' : '/files/extjs/jupyter',
+        'Ext' : '/files/extjs/Ext',
         '{}' : '/files/extjs/{}'
       }},
       {}
@@ -22,17 +21,22 @@ def control(app,stores=None,viewClass=None):
         Ext.create('{}',{{
           width: '100%',
           height: 500,
+          {}
           renderTo: out
         }});
       }}
-    }});'''.format(app,app,app,'stores:'+ stores + ',' if stores is not None else '',controllers,viewClass)
+    }});'''.format(app,app,app
+                   ,'stores:'+ stores + ',' if stores is not None else ''
+                   ,controllers if controllers is not None else ''
+                   , viewClass
+                   , str(config).strip('{}') + ',' if config is not None else '')
   return Javascript(code
     # ,lib=['https://cdnjs.cloudflare.com/ajax/libs/extjs/6.2.0/ext-all-debug.js'
     #       ,'https://cdnjs.cloudflare.com/ajax/libs/extjs/6.2.0/packages/charts/classic/charts-debug.js']
     ,css=[
-      'https://cdnjs.cloudflare.com/ajax/libs/extjs/6.2.0/packages/charts/classic/crisp/resources/charts-all-debug.css'
-      ,'https://cdnjs.cloudflare.com/ajax/libs/extjs/6.2.0/classic/theme-crisp/resources/theme-crisp-all_1.css'
-      ,'https://cdnjs.cloudflare.com/ajax/libs/extjs/6.2.0/classic/theme-crisp/resources/theme-crisp-all_2.css'
+      'https://cdnjs.cloudflare.com/ajax/libs/extjs/6.2.0/packages/charts/classic/crisp/resources/charts-all-debug.css',
+      'https://cdnjs.cloudflare.com/ajax/libs/extjs/6.2.0/classic/theme-crisp/resources/theme-crisp-all_1.css',
+      'https://cdnjs.cloudflare.com/ajax/libs/extjs/6.2.0/classic/theme-crisp/resources/theme-crisp-all_2.css'
     ])
 
 def to_message(df):
