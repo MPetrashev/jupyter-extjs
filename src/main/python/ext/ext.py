@@ -1,39 +1,41 @@
 from IPython.display import display,Javascript
 import numpy as np
 
-def control(app,stores=None,viewClass=None, controllers=None, config=None):
+def control(app,viewClass=None, controllers=None, config=None):
+  capitalizedApp = app.capitalize()
   if viewClass is None:
-    capitalizedApp = app.capitalize()
     viewClass = '{}.view.{}Panel'.format(app,capitalizedApp)
-    controllers = "controllers: '{}PanelController',".format(capitalizedApp)
 
-  code = '''var out = Jupyter.notebook.get_selected_cell().output_area.element[0];
-    Ext.application({{
-      name: '{}',
-      paths: {{
-        'jupyter' : '/files/extjs/jupyter',
-        'Ext' : '/files/extjs/Ext',
-        '{}' : '/files/extjs/{}'
-      }},
-      {}
-      {}
-      launch: function () {{
-        Ext.create('{}',{{
-          width: '100%',
-          height: 500,
-          {}
-          renderTo: out
-        }});
-      }}
-    }});'''.format(app,app,app
-                   ,'stores:'+ stores + ',' if stores is not None else ''
-                   ,controllers if controllers is not None else ''
-                   , viewClass
-                   , str(config).strip('{}') + ',' if config is not None else '')
+  code = '''
+    var out = this.element[0];//Jupyter.notebook.get_selected_cell().output_area.element[0];
+    function initUI() {{
+      Ext.application({{
+        name: '{}',
+        paths: {{
+          'jupyter' : '/files/extjs/jupyter',
+          'Ext' : '/files/extjs/Ext',
+          '{}' : '/files/extjs/{}'
+        }},
+        {}
+        launch: function () {{
+          Ext.syncRequire('{}');
+          Ext.create('{}',{{
+            width: '100%',
+            height: 800,
+            {}
+            renderTo: out
+          }});
+        }}
+      }});
+    }}
+    if(typeof Ext != 'undefined')
+      initUI();
+    '''.format(app,app,app,"controllers: '{}',".format(controllers) if controllers is not None else '', viewClass, viewClass
+               , str(config).strip('{}') + ',' if config is not None else '')
   return Javascript(code
-    # ,lib=['https://cdnjs.cloudflare.com/ajax/libs/extjs/6.2.0/ext-all-debug.js'
-    #       ,'https://cdnjs.cloudflare.com/ajax/libs/extjs/6.2.0/packages/charts/classic/charts-debug.js']
-    ,css=[
+                    # ,lib=['https://cdnjs.cloudflare.com/ajax/libs/extjs/6.2.0/ext-all-debug.js'
+                    #       ,'https://cdnjs.cloudflare.com/ajax/libs/extjs/6.2.0/packages/charts/classic/charts-debug.js']
+                    ,css=[
       'https://cdnjs.cloudflare.com/ajax/libs/extjs/6.2.0/packages/charts/classic/crisp/resources/charts-all-debug.css',
       'https://cdnjs.cloudflare.com/ajax/libs/extjs/6.2.0/classic/theme-crisp/resources/theme-crisp-all_1.css',
       'https://cdnjs.cloudflare.com/ajax/libs/extjs/6.2.0/classic/theme-crisp/resources/theme-crisp-all_2.css'

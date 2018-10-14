@@ -32,7 +32,7 @@ Ext.define('jupyter.store.JupyterProxy', {
             params[ param ] = operation[ param ]; 
           }
         }
-        params = '**' + Ext.encode(params);
+        params = '**' + Ext.encode(params).replace(/:null/g,':None');
       } else
         params = params == 'root' ? -1 : params;
       cmd = 'ext.to_message(' + cmd+'(' + params + ') )';
@@ -85,12 +85,16 @@ Ext.define('jupyter.store.JupyterProxy', {
           }
         }
       }
-      var types = [];
+      var types = [],
+          isTree = gridView.xtype == 'treeview';
       for( var i in data ){
         var c = data[ i ][0]
             ,t = data[ i ][1];
         types.push(t);
-        if( c != 'Name' ){
+        if( i == 0 && isTree ){
+          columns[0].dataIndex = c;
+          columns[0].setText( c );
+        } else{ 
           var column = {
             xtype: 'gridcolumn',
             text: c,

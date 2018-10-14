@@ -1,8 +1,19 @@
-Ext.define('jupyter.view.GridPanel', {
-  extend: 'Ext.grid.Panel',
-  alias: 'widget.jgrid',
+Ext.define('jupyter.view.TreeGridPanel', {
+  extend: 'Ext.tree.Panel',
+  alias: 'widget.jtree',
   requires : ['jupyter.store.JupyterProxy','Ext.grid.plugin.Exporter','Ext.exporter.text.CSV'],
-  plugins: ['gridfilters','gridexporter'],
+  //plugins: ['gridfilters','gridexporter'],
+  rootVisible: false,
+  applyStore: function(store) {
+    var store = this.callParent(arguments);
+    store.getProxy().readColumns(this); 
+    return store;
+  },
+  columns: [{
+    xtype: 'treecolumn',
+    dataIndex: 'Name',
+    flex: 2
+  }],
   tools: [{
     iconCls: 'frtb-excel',
     handler: function() {
@@ -13,23 +24,10 @@ Ext.define('jupyter.view.GridPanel', {
     /**
      * Python command which needs to be run to get a data
      */
-    command : undefined,
-    /**
-     * Show the id column
-     */
-    showIdColumn : false
-  },
-  _params : {},
-  getParams:function() { 
-    return this._params;
-  },
-  setParams:function(value) { 
-    this._params = value;
-    this.getSelectionModel().deselectAll();
-    this.getStore().load( value );
+    command : undefined
   },
   store: {
-    type: 'store',
+    type: 'tree',
     proxy: {
       type : 'jupyter'
     }
@@ -45,10 +43,9 @@ Ext.define('jupyter.view.GridPanel', {
     var proxy = this.store.getProxy();
     proxy.setCommand( this.getCommand() );
     var me = this;
-    this.store.on('metachange',function(store, meta) {
-      var cols = me.showIdColumn ? meta.colModel : meta.colModel.slice(1);
-      me.reconfigure(store,cols);
-    });
+    /*this.store.on('metachange',function(store, meta) {
+      me.reconfigure(store,meta.colModel);
+    });*/
     this.callParent(arguments);
   }
 });
