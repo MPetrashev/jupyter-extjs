@@ -21,6 +21,13 @@ def app(app,viewClass=None, controllers=None, config={'height': 800}):
         }},
         {}
         launch: function () {{
+          Ext.override(Ext.draw.modifier.Target,{{
+            applyChanges : function(){{
+              if( this.getSprite() )
+                originalApplyChanges.apply(this,arguments);
+            }}
+          }});
+          console.log('Ext.draw.modifier.Target has been patched');
           Ext.syncRequire('{}');
           Ext.create('{}',{{
             width: '100%',
