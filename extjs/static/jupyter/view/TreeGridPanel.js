@@ -4,7 +4,7 @@ Ext.define('jupyter.view.TreeGridPanel', {
   requires : ['jupyter.store.JupyterProxy','Ext.grid.plugin.Exporter','Ext.exporter.text.CSV'],
   //plugins: ['gridfilters','gridexporter'],
   rootVisible: false,
-  applyStore: function(store) {
+  applyStore: function(tore) {
     var store = this.callParent(arguments);
     store.getProxy().readColumns(this); 
     return store;
