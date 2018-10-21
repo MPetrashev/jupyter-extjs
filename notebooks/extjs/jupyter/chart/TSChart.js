@@ -35,6 +35,7 @@ Ext.define('jupyter.chart.TSChart', {
     type: 'numeric',
     position: 'left',
     grid: true,
+    minimum:0,
     renderer: function(axis,label,layoutContext,lastLabel){
       return Ext.util.Format.number(label,'0,000');
     }
