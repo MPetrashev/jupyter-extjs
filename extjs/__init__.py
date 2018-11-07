@@ -21,6 +21,7 @@ def app(app,viewClass=None, controllers=None, config={'height': 800}):
         }},
         {}
         launch: function () {{
+          var originalApplyChanges = Ext.draw.modifier.Target.prototype.applyChanges;
           Ext.override(Ext.draw.modifier.Target,{{
             applyChanges : function(){{
               if( this.getSprite() )

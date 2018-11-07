@@ -5,6 +5,9 @@ An ExtJS Jupyter extension
 
 Installation
 ------------
+To build and deploy:
+
+    $ python setup.py sdist upload
 
 To install use pip:
 
